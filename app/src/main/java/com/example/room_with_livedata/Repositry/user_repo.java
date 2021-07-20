@@ -26,20 +26,31 @@ public class user_repo {
     }
 
     public void insert(Database_models db_model) {
-        new insetAsyncTask(db_interface).execute(db_model);
+//        new insetAsyncTask(db_interface).execute(db_model);
+        doitback(db_model,db_interface);
+
+
     }
-
-    private static class insetAsyncTask extends AsyncTask<Database_models, Void, Void> {
-        private Database_interface async_db_inter;
-
-        public insetAsyncTask(Database_interface db_interface) {
-            async_db_inter = db_interface;
-        }
-
-        @Override
-        protected Void doInBackground(Database_models... database_models) {
-            async_db_inter.insert(database_models[0]);
-            return null;
-        }
-    }
+void doitback(Database_models data_mod,Database_interface interfaced){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                interfaced.insert(data_mod);
+            }
+        }).start();
+}
+//    private static class insetAsyncTask extends AsyncTask<Database_models, Void, Void> {
+//        private Database_interface async_db_inter;
+//
+//        public insetAsyncTask(Database_interface db_interface) {
+//            async_db_inter = db_interface;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Database_models... database_models) {
+//            System.out.println("sdjfjskfksbfkbskfnksnkf "+database_models[0]);
+//            async_db_inter.insert(database_models[0]);
+//            return null;
+//        }
+//    }
 }
