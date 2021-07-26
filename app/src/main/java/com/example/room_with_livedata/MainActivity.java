@@ -28,9 +28,10 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     TodoViewModels view_model;
     Database_models r_data;
-    List<Database_models> db_model_list = new ArrayList<>();
+//    List<Database_models> db_model_list = new ArrayList<>();
     TextView dataText;
-    int count = db_model_list.size();
+    boolean initial_load=false;
+//    int count = db_model_list.size();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +43,17 @@ public class MainActivity extends AppCompatActivity {
         view_model.fetch_live().observe(this, new Observer<List<Database_models>>() {
             @Override
             public void onChanged(List<Database_models> database_models) {
+                System.out.println("new Designation is "+database_models.get(0).getDesignation());
+//                db_model_list = database_models;
                 System.out.println("jhsjdbsjbjds");
-                db_model_list = database_models;
-                printit();
+                if(database_models.size()==0){
+                    initial_load=true;
+                }
+                else {
+                 initial_load=false;
+                }
+
+                printit(database_models);
 //                Collections.shuffle(db_model_list);
 
             }
@@ -62,17 +71,34 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<datamodels>> call, Response<List<datamodels>> response) {
                 if (response.isSuccessful()) {
                     if (response != null) {
-                        List<datamodels> datamodels = response.body();
-                        for (int i = 0; i < datamodels.size(); i++) {
-                            String name = datamodels.get(i).getName();
-                            String desig = datamodels.get(i).getDesignation();
-                            String date = datamodels.get(i).getDate();
-                            view_model.insert(new Database_models(name, desig, date));
-                            System.out.println(",snfnsdnf");
+                        if(initial_load){
+                            System.out.println("insert");
+                            List<datamodels> datamodels = response.body();
+                            for (int i = 0; i < datamodels.size(); i++) {
+                                String name = datamodels.get(i).getName();
+                                String desig = datamodels.get(i).getDesignation();
+                                String date = datamodels.get(i).getDate();
+                                view_model.insert(new Database_models(name, desig, date));
+                                System.out.println(",snfnsdnf");
 
+                            }
+                        }else {
+                            System.out.println("viewmodel_update");
+                            List<datamodels> datamodels = response.body();
+                            for (int i = 0; i < datamodels.size(); i++) {
+                                String name = datamodels.get(i).getName();
+                                String desig =datamodels.get(i).getDesignation();
+                                String date = datamodels.get(i).getDate();
+                                Database_models db_mod=new Database_models(name, desig, date);
+                                db_mod.setId(i+1);
+                                view_model.update(db_mod);
+                                System.out.println(",snfnsdnf");
+
+                            }
                         }
 
-                        printit();
+
+//                        printit();
 //                        Handler handler=new Handler();
 //                        handler.postDelayed(new Runnable() {
 //                            @Override
@@ -88,13 +114,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<datamodels>> call, Throwable t) {
-
+System.out.println("No network...");
             }
         });
     }
 
-    void printit() {
-        while (count < db_model_list.size()) {
+    void printit(List<Database_models> db_model_list) {
+        int count=0;
+        while (count<db_model_list.size()) {
             dataText.setText(dataText.getText() + "\n" + db_model_list.get(count).getId() + "\n" + db_model_list.get(count).getName() + "\n" + db_model_list.get(count).getDesignation() + "\n" + db_model_list.get(count).getDate() + "\n");
             count++;
         }

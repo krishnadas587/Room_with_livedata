@@ -26,4 +26,8 @@ public class TodoViewModels extends AndroidViewModel {
     public void insert(@NonNull Database_models datas){
         repository.insert(datas);
     }
+    public void update(@NonNull Database_models datas){
+
+        repository.update(datas);
+    }
 }
